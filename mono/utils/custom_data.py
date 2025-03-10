@@ -9,6 +9,7 @@ def load_from_annos(anno_path):
 
     datas = []
     for i, anno in enumerate(annos):
+        # 普通相机：images/indoor_DSC01542.JPG；全景相机：images/00/indoor_DSC01542.JPG
         rgb = anno['rgb']
         depth = anno['depth'] if 'depth' in anno else None
         depth_scale = anno['depth_scale'] if 'depth_scale' in anno else 1.0
@@ -21,7 +22,7 @@ def load_from_annos(anno_path):
             'depth_scale': depth_scale,
             'intrinsic': intrinsic,
             'filename': os.path.basename(rgb),
-            'folder': rgb.split('/')[-3],
+            'folder': rgb.split('/')[-2],
             'normal': normal
         }
         datas.append(data_i)

@@ -216,7 +216,7 @@ def compute_depth_expectation(prob, depth_values):
     return depth
 
 def interpolate_float32(x, size=None, scale_factor=None, mode='nearest', align_corners=None):
-    with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=False):
+    with torch.autocast(device_type='cuda', dtype=torch.float16, enabled=False):
         return F.interpolate(x.float(), size=size, scale_factor=scale_factor, mode=mode, align_corners=align_corners)
 
 # def upflow8(flow, mode='bilinear'):

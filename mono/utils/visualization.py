@@ -72,22 +72,36 @@ def save_normal_val_imgs(
     if rgb.size(0) == 3:
         rgb = rgb.permute(1,2,0)
 
-    pred_color = vis_surface_normal(pred, mask)
-    targ_color = vis_surface_normal(targ, mask)
-    rgb_color = ((rgb.cpu().numpy() * std) + mean).astype(np.uint8)
+    pred_color, pred = vis_surface_normal(pred, mask)
+    targ_color, _ = vis_surface_normal(targ, mask)
+    # rgb_color = ((rgb.cpu().numpy() * std) + mean).astype(np.uint8)
 
-    try:
-        cat_img = np.concatenate([rgb_color, pred_color, targ_color], axis=0)
-    except:
-        pred_color = cv2.resize(pred_color, (rgb.shape[1], rgb.shape[0]))
-        targ_color = cv2.resize(targ_color, (rgb.shape[1], rgb.shape[0]))
-        cat_img = np.concatenate([rgb_color, pred_color, targ_color], axis=0)
+    # try:
+    #     cat_img = np.concatenate([rgb_color, pred_color, targ_color], axis=0)
+    # except:
+    #     pred_color = cv2.resize(pred_color, (rgb.shape[1], rgb.shape[0]))
+    #     targ_color = cv2.resize(targ_color, (rgb.shape[1], rgb.shape[0]))
+    #     cat_img = np.concatenate([rgb_color, pred_color, targ_color], axis=0)
+    # plt.imsave(os.path.join(save_dir, filename[:-4] + '_merge.jpg'), cat_img)
 
-    plt.imsave(os.path.join(save_dir, filename[:-4]+'_merge.jpg'), cat_img)
+    # save_dir: ../../Dataset/3DGS_Dataset/memorial4_test/normal
+    # filename: 全景相机：00/0122.png；普通相机：images/indoor_DSC01542.JPG
+    subfolder_name = filename.split('/')[-2] if filename.split('/')[-2] in ['00','01','02','03', '04','05','06','07','08'] else ''
+    subfolder = os.path.join(save_dir, subfolder_name)
+    os.makedirs(subfolder, exist_ok=True)
+    file_save_path = os.path.join(subfolder, filename.split('/')[-1][:-4])
+    plt.imsave(file_save_path + '.png', pred_color)
+    np.save(file_save_path + '.npy', pred)
+
+    # rgb_subfolder = 'rgb_out/' + filename.split('/')[1]  # rgb_out/00
+    # rgb_folder = os.path.join(save_dir, rgb_subfolder)
+    # os.makedirs(rgb_folder, exist_ok=True)
+    # plt.imsave(os.path.join(rgb_folder, filename[-8:-4] + '.png'), rgb_color)
+
     # cv2.imwrite(os.path.join(save_dir, filename[:-4]+'.jpg'), pred_color)
     # save to tensorboard
-    if tb_logger is not None:
-        tb_logger.add_image(f'{filename[:-4]}_merge.jpg', cat_img.transpose((2, 0, 1)), iter)
+    # if tb_logger is not None:
+    #     tb_logger.add_image(f'{filename[:-4]}_merge.jpg', cat_img.transpose((2, 0, 1)), iter)
 
 def get_data_for_log(pred: torch.tensor, target: torch.tensor, rgb: torch.tensor):
     mean = np.array([123.675, 116.28, 103.53])[:, np.newaxis, np.newaxis]
@@ -127,14 +141,14 @@ def vis_surface_normal(normal: torch.tensor, mask: torch.tensor=None) -> np.arra
         normal (torch.tensor, [h, w, 3]): surface normal
         mask (torch.tensor, [h, w]): valid masks
     """
-    normal = normal.cpu().numpy().squeeze()
-    n_img_L2 = np.sqrt(np.sum(normal ** 2, axis=2, keepdims=True))
-    n_img_norm = normal / (n_img_L2 + 1e-8)
+    normal = normal.cpu().numpy().squeeze() # h w 3
+    n_img_L2 = np.sqrt(np.sum(normal ** 2, axis=2, keepdims=True))  # h w 1
+    n_img_norm = normal / (n_img_L2 + 1e-8) # h w 1, 归一化到-1, 1之间
     normal_vis = n_img_norm * 127
     normal_vis += 128
     normal_vis = normal_vis.astype(np.uint8)
     if mask is not None:
         mask = mask.cpu().numpy().squeeze()
         normal_vis[~mask] = 0
-    return normal_vis
+    return normal_vis, n_img_norm
 

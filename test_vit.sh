@@ -1,5 +1,14 @@
-python mono/tools/test_scale_cano.py \
-    'mono/configs/HourglassDecoder/vit.raft5.small.py' \
-    --load-from ./weight/metric_depth_vit_small_800k.pth \
-    --test_data_path ./data/wild_demo \
-    --launcher None
+export CUDA_VISIBLE_DEVICES=3
+# Retail_Street, CBD_building_02
+scenes=("TQZZ_2")
+
+for scene in "${scenes[@]}"; do
+  echo "estimate normal on: $scene"
+
+  python mono/tools/test_scale_cano.py \
+      'mono/configs/HourglassDecoder/vit.raft5.large.py' \
+      --load-from ./weight/metric_depth_vit_large_800k.pth \
+      --test_data_path ../../remote_data/dataset_reality/test/$scene/test_annotations.json \
+      --show-dir ../../remote_data/dataset_reality/test/$scene/normal \
+      --launcher None
+done

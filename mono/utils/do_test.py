@@ -215,9 +215,9 @@ def do_scalecano_test_with_custom_data(
 
     show_dir = cfg.show_dir
     save_interval = 1
-    save_imgs_dir = show_dir + '/vis'
+    save_imgs_dir = show_dir    # ../../Dataset/3DGS_Dataset/memorial4_test/normal
     os.makedirs(save_imgs_dir, exist_ok=True)
-    save_pcd_dir = show_dir + '/pcd'
+    save_pcd_dir = show_dir     # ../../Dataset/3DGS_Dataset/memorial4_test/normal
     os.makedirs(save_pcd_dir, exist_ok=True)
 
     normalize_scale = cfg.data_basic.depth_range[1]
@@ -231,7 +231,7 @@ def do_scalecano_test_with_custom_data(
         rgb_inputs, pads, label_scale_factors, gt_depths, rgb_origins = [], [], [], [], []
         
         for an in batch_data:
-            print(an['rgb'])
+            # print(an['rgb'])
             rgb_origin = cv2.imread(an['rgb'])[:, :, ::-1].copy()
             rgb_origins.append(rgb_origin)
             gt_depth = None
@@ -322,37 +322,37 @@ def postprocess_per_image(i, pred_depth, gt_depth, intrinsic, rgb_origin, normal
         dam_global.update_metrics_gpu(pred_global, gt_depth, mask, is_distributed)
         print(gt_depth[gt_depth != 0].median() / pred_depth[gt_depth != 0].median(), )
     
-    os.makedirs(osp.join(save_imgs_dir, an['folder']), exist_ok=True)
+    # os.makedirs(osp.join(save_imgs_dir, an['folder']), exist_ok=True)
     rgb_torch = torch.from_numpy(rgb_origin).to(pred_depth.device).permute(2, 0, 1)
     mean = torch.tensor([123.675, 116.28, 103.53]).float()[:, None, None].to(rgb_torch.device)
     std = torch.tensor([58.395, 57.12, 57.375]).float()[:, None, None].to(rgb_torch.device)
     rgb_torch = torch.div((rgb_torch - mean), std)
 
-    save_val_imgs(
-        i,
-        pred_depth,
-        gt_depth if gt_depth is not None else torch.ones_like(pred_depth, device=pred_depth.device),
-        rgb_torch,
-        osp.join(an['folder'], an['filename']),
-        save_imgs_dir,
-    )
+    # save_val_imgs(
+    #     i,
+    #     pred_depth,
+    #     gt_depth if gt_depth is not None else torch.ones_like(pred_depth, device=pred_depth.device),
+    #     rgb_torch,
+    #     osp.join(an['folder'], an['filename']),
+    #     save_imgs_dir,
+    # )
     #save_raw_imgs(pred_depth.detach().cpu().numpy(), rgb_torch, osp.join(an['folder'], an['filename']), save_imgs_dir, 1000.0)
 
     # pcd
-    pred_depth = pred_depth.detach().cpu().numpy()
+    # pred_depth = pred_depth.detach().cpu().numpy()
     #pcd = reconstruct_pcd(pred_depth, intrinsic[0], intrinsic[1], intrinsic[2], intrinsic[3])
     #os.makedirs(osp.join(save_pcd_dir, an['folder']), exist_ok=True)
     #save_point_cloud(pcd.reshape((-1, 3)), rgb_origin.reshape(-1, 3), osp.join(save_pcd_dir, an['folder'], an['filename'][:-4]+'.ply'))
 
-    if an['intrinsic'] == None:
-        #for r in [0.9, 1.0, 1.1]:
-        for r in [1.0]:
-            #for f in [600, 800, 1000, 1250, 1500]:
-            for f in [1000]:
-                pcd = reconstruct_pcd(pred_depth, f * r, f * (2-r), intrinsic[2], intrinsic[3])
-                fstr = '_fx_' + str(int(f * r)) + '_fy_' + str(int(f * (2-r)))
-                os.makedirs(osp.join(save_pcd_dir, an['folder']), exist_ok=True)
-                save_point_cloud(pcd.reshape((-1, 3)), rgb_origin.reshape(-1, 3), osp.join(save_pcd_dir, an['folder'], an['filename'][:-4] + fstr +'.ply'))
+    # if an['intrinsic'] == None:
+    #     #for r in [0.9, 1.0, 1.1]:
+    #     for r in [1.0]:
+    #         #for f in [600, 800, 1000, 1250, 1500]:
+    #         for f in [1000]:
+    #             pcd = reconstruct_pcd(pred_depth, f * r, f * (2-r), intrinsic[2], intrinsic[3])
+    #             fstr = '_fx_' + str(int(f * r)) + '_fy_' + str(int(f * (2-r)))
+    #             os.makedirs(osp.join(save_pcd_dir, an['folder']), exist_ok=True)
+    #             save_point_cloud(pcd.reshape((-1, 3)), rgb_origin.reshape(-1, 3), osp.join(save_pcd_dir, an['folder'], an['filename'][:-4] + fstr +'.ply'))
 
     if normal_out is not None:
         pred_normal = normal_out[:3, :, :] # (3, H, W)
@@ -378,7 +378,7 @@ def postprocess_per_image(i, pred_depth, gt_depth, intrinsic, rgb_origin, normal
                             pred_normal, 
                             gt_normal if gt_normal is not None else torch.ones_like(pred_normal, device=pred_normal.device),
                             rgb_torch, # data['input'], 
-                            osp.join(an['folder'], 'normal_'+an['filename']), 
+                            osp.join(an['folder'], an['filename']),
                             save_imgs_dir,
                             )
 
