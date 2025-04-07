@@ -6,7 +6,7 @@ if __name__=='__main__':
     import json
 
     code_root = '/data2/liuzhi/3DGS_code/Metric3D/'
-    scene = "TQZZ_2"
+    scene = "t100pro_in_talandB1"
     # data_root = osp.join(code_root, '../../Dataset/3DGS_Dataset/input/gm_Museum')
     data_root = osp.join(code_root, '../../remote_data/dataset_reality/test/' + scene)
     split_root = code_root
@@ -35,7 +35,7 @@ if __name__=='__main__':
     for rgb_file in os.listdir(rgb_root):
         rgb_path = osp.join(rgb_root, rgb_file).split(split_root)[-1]
         # depth_path = rgb_path.replace('/rgb/', '/depth/')
-        cam_in = [640, 640, 640, 480]
+        cam_in = [480, 480, 480, 360]
         # cam_in = [, 556.281585, 480, 270.00]
         depth_scale = 1.
 

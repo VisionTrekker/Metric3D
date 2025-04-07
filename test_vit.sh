@@ -1,6 +1,6 @@
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=1
 # Retail_Street, CBD_building_02
-scenes=("TQZZ_2")
+scenes=("t100pro_in_talandB1")
 
 for scene in "${scenes[@]}"; do
   echo "estimate normal on: $scene"

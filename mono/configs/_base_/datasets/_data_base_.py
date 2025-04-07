@@ -2,8 +2,8 @@
 #  
 data_basic=dict(
     canonical_space = dict(
-        img_size=(540, 960),
-        focal_length=1196.0,
+        img_size=(720, 960),
+        focal_length=480.0,
     ),
     depth_range=(0.9, 150),
     depth_normalize=(0.006, 1.001),
