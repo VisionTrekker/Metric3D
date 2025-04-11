@@ -90,8 +90,8 @@ def save_normal_val_imgs(
     subfolder = os.path.join(save_dir, subfolder_name)
     os.makedirs(subfolder, exist_ok=True)
     file_save_path = os.path.join(subfolder, filename.split('/')[-1][:-4])
-    plt.imsave(file_save_path + '.png', pred_color)
-    # np.save(file_save_path + '.npy', pred)
+    # plt.imsave(file_save_path + '.png', pred_color)
+    np.save(file_save_path + '.npy', pred)
 
     # rgb_subfolder = 'rgb_out/' + filename.split('/')[1]  # rgb_out/00
     # rgb_folder = os.path.join(save_dir, rgb_subfolder)
